@@ -14,7 +14,7 @@ LED = {c: machine.Pin(pin, machine.Pin.OUT)
        for c, pin in {"r": 13, "g": 12, "b": 14}.items()}
 
 # === Wi‑Fi 接続 ===========================================
-def wifi_connect():
+def wifi_connect() -> str:
     sta = network.WLAN(network.STA_IF)
     sta.active(True)
     if not sta.isconnected():
@@ -27,11 +27,17 @@ def wifi_connect():
 def set_led(colors: str) -> dict:
     for p in LED.values():
         p.off()
-    for c in colors:
-        LED.get(c) and LED[c].on()
+    for c in colors:               # 必要な色だけ点灯
+        led = LED.get(c)
+        if led:
+            led.on()
     return {"cmd": "led", "led": colors or "off", "status": "ok"}
 
-# === MQTT コールバック ====================================
+# === 共通レスポンス関数 ==================================
+def error_resp(msg: str) -> dict:
+    return {"cmd": "error", "msg": msg, "status": "error"}
+
+# === MQTT コールバック ==================================
 def on_msg(topic, raw):
     try:
         req = ujson.loads(raw)
@@ -41,26 +47,31 @@ def on_msg(topic, raw):
         if req.get("cmd") == "led":
             resp = set_led(req.get("value", ""))
         elif req == {"cmd": "dht11", "value": "get"}:
-            sensor.measure()
-            resp = {
-                "cmd": "dht11",
-                "temperature": sensor.temperature(),
-                "humidity": sensor.humidity(),
-                "status": "ok",
-            }
+            try:
+                sensor.measure()
+                resp = {
+                    "cmd": "dht11",
+                    "temperature": sensor.temperature(),
+                    "humidity": sensor.humidity(),
+                    "status": "ok",
+                }
+            except Exception as e:
+                resp = error_resp("DHT11 read failed: " + str(e))
+
+        # 未知コマンド
         else:
-            resp = {"cmd": "error", "msg": "unknown command"}
+            resp = error_resp("unknown command")
 
         client.publish(TOPIC, ujson.dumps(resp))
 
     except Exception as e:
-        client.publish(TOPIC, ujson.dumps({"cmd": "error", "msg": str(e)}))
+        client.publish(TOPIC, ujson.dumps(error_resp(str(e))))
 
-# === MQTT 接続（失敗しても戻らない） =======================
-def mqtt_connect(retry_delay=2) -> MQTTClient:
+# === MQTT 接続（成功するまで再試行） ====================
+def mqtt_connect(retry_delay: int = 2) -> MQTTClient:
     while True:
         try:
-            c = MQTTClient("esp32", BROKER, keepalive=30)
+            c = MQTTClient(CLIENT_ID, BROKER, keepalive=30)
             c.set_callback(on_msg)
             c.connect()
             c.subscribe(TOPIC)
