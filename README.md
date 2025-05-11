@@ -25,7 +25,7 @@ MQTTサーバーをAzure IoT Hubなどに置き換えると、インターネッ
 docker compose up -d
 ```
 
-## MicroPythonで書き込み
+## 💾 MicroPythonで書き込み
 MicroPythonをESP32にインストールする方法は下記を参照ください。
 https://zenn.dev/kotaproj/articles/d969fb39100da443f41f
 
