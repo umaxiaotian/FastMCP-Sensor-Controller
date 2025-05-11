@@ -1,0 +1,20 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+  fastmcp:
+    image: python:3.12
+    container_name: fastmcp
+    working_dir: /app
+    volumes:
+      - ./src:/app
+    ports:
+      - "8888:8888"
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python main.py"
