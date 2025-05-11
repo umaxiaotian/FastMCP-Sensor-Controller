@@ -4,10 +4,9 @@
 MQTTサーバーをAzure IoT Hubなどに置き換えると、インターネット越しにマイコンと会話させることもできます。
 
 FastMCPのドキュメント: https://gofastmcp.com/getting-started/welcome
-![esp32_circuit_ブレッドボード](https://github.com/user-attachments/assets/35f49110-3ae6-441f-9cb7-b3efbce09aa5)
 
 ## ✅ 構成
-
+![esp32_circuit_ブレッドボード](https://github.com/user-attachments/assets/35f49110-3ae6-441f-9cb7-b3efbce09aa5)
 - ESP32（MicroPython）:
   - マイコン
     - ESP32-DevKit(※技適マーク付き)
