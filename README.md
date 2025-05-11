@@ -5,6 +5,9 @@ MQTTサーバーをAzure IoT Hubなどに置き換えると、インターネッ
 ## ✅ 構成
 ![esp32_circuit_ブレッドボード](https://github.com/user-attachments/assets/658ffe65-04c2-4984-85ee-c3085c159579)
 - ESP32（MicroPython）:
+  - マイコン
+    - ESP32-DevKit(※技適マーク付き)
+      - https://amzn.to/4iWmr4s 
   - パーツ
     - DHT11 温湿度センサー　※DHT11 module
         - https://amzn.to/43jR2n8
